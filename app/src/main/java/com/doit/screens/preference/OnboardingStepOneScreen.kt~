@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun onboardingStepOneScreen(onNext: () -> Unit, onBack: () -> Unit) {
     var gender by remember { mutableStateOf("") }
+    var dob by remember { mutableStateOf("") }
     var height by remember { mutableStateOf("") }
     var weight by remember { mutableStateOf("") }
     var goalWeight by remember { mutableStateOf("") }
@@ -25,7 +26,10 @@ fun onboardingStepOneScreen(onNext: () -> Unit, onBack: () -> Unit) {
             text = buildAnnotatedString {
                 append("Let's Get to ")
                 withStyle(SpanStyle(color = Color.Cyan)) { append("Know You") }
-            }, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White
+            },
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
         )
 
         Text(
@@ -39,16 +43,15 @@ fun onboardingStepOneScreen(onNext: () -> Unit, onBack: () -> Unit) {
 
         CustomDropdownField("Gender", gender) { gender = it }
         Spacer(modifier = Modifier.height(12.dp))
+        CustomDropdownField("Date of Birth", dob) { dob = it }
+        Spacer(modifier = Modifier.height(12.dp))
         CustomDropdownField("Height", height) { height = it }
         Spacer(modifier = Modifier.height(12.dp))
 
         Row(modifier = Modifier.fillMaxWidth()) {
             CustomDropdownField("Weight", weight, modifier = Modifier.weight(1f)) { weight = it }
             Spacer(modifier = Modifier.width(12.dp))
-            CustomDropdownField(
-                "Goal weight", goalWeight, modifier = Modifier.weight(1f)
-            ) { goalWeight = it }
+            CustomDropdownField("Goal weight", goalWeight, modifier = Modifier.weight(1f)) { goalWeight = it }
         }
     }
 }
-

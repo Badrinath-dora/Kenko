@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.widget.DatePicker
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -52,26 +53,29 @@ fun OnboardingScaffold(
             .padding(start = 24.dp, end = 24.dp, top = topPadding, bottom = 32.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
+            Icon(imageVector = Icons.Default.ArrowBack,
                 contentDescription = "Back",
                 tint = Color.White,
-                modifier = Modifier.clickable { onBack() }
-            )
+                modifier = Modifier.clickable { onBack() })
             Spacer(modifier = Modifier.weight(1f))
             Text(text = "$step/$totalSteps", color = Color.White)
         }
         Spacer(modifier = Modifier.height(10.dp))
         Row(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             repeat(totalSteps) { index ->
                 Box(
-                    modifier = Modifier.weight(1f).height(4.dp).background(
-                        color = if (index < step) Color.Cyan else Color.Gray,
-                        shape = RoundedCornerShape(50)
-                    )
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(4.dp)
+                        .background(
+                            color = if (index < step) Color.Cyan else Color.Gray,
+                            shape = RoundedCornerShape(50)
+                        )
                 )
                 if (index != totalSteps - 1) Spacer(modifier = Modifier.width(4.dp))
             }
@@ -80,17 +84,20 @@ fun OnboardingScaffold(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(rememberScrollState()),
-            content = content
+                .verticalScroll(rememberScrollState()), content = content
         )
+
+        val buttonLabel = if (step == totalSteps) "Finish" else "Continue"
 
         Button(
             onClick = onContinue,
-            modifier = Modifier.fillMaxWidth().height(50.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
             shape = RoundedCornerShape(25.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4EC5D6))
         ) {
-            Text(text = "Continue", color = Color.Black)
+            Text(text = buttonLabel, color = Color.Black)
         }
     }
 }
@@ -100,8 +107,8 @@ fun OnboardingScaffold(
 fun CustomDropdownField(
     label: String, value: String, modifier: Modifier = Modifier, onValueChange: (String) -> Unit
 ) {
-    val context = LocalContext.current
-    var expanded by remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+
     val options = when (label) {
         "Gender" -> listOf("Male", "Female", "Other")
         "Height" -> (140..220).map { "$it cm" }
@@ -117,91 +124,49 @@ fun CustomDropdownField(
             modifier = Modifier.padding(bottom = 4.dp)
         )
 
-        if (label == "Date of Birth") {
-            val calendar = Calendar.getInstance()
-            TextField(
-                value = value.ifEmpty { "Select" },
+        var expanded by remember { mutableStateOf(false) }
+
+        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+            OutlinedTextField(value = value.ifEmpty { "Select" },
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = null,
-                        tint = Color.White
-                    )
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                 },
+                interactionSource = interactionSource,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        DatePickerDialog(
-                            context,
-                            { _: DatePicker, y: Int, m: Int, d: Int ->
-                                val selectedCalendar = Calendar.getInstance().apply {
-                                    set(Calendar.YEAR, y)
-                                    set(Calendar.MONTH, m)
-                                    set(Calendar.DAY_OF_MONTH, d)
-                                }
-                                val formatted = android.text.format.DateFormat.format("dd MMM yyyy", selectedCalendar).toString()
-                                onValueChange(formatted)
-                            },
-                            calendar.get(Calendar.YEAR),
-                            calendar.get(Calendar.MONTH),
-                            calendar.get(Calendar.DAY_OF_MONTH)
-                        ).show()
-                    },
+                    .menuAnchor()
+                    .fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     focusedTextColor = Color.White,
                     unfocusedTextColor = Color.White,
                     focusedContainerColor = Color.DarkGray,
                     unfocusedContainerColor = Color.DarkGray,
-                    disabledContainerColor = Color.DarkGray,
-                    disabledIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
                 )
             )
-        } else {
-            ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-                TextField(
-                    value = value.ifEmpty { "Select" },
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                    },
-                    modifier = Modifier.menuAnchor().fillMaxWidth(),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedContainerColor = Color.DarkGray,
-                        unfocusedContainerColor = Color.DarkGray,
-                        disabledContainerColor = Color.DarkGray,
-                        disabledIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent
-                    )
-                )
 
-                val maxVisibleItems = 5
-                val isScrollable = label in listOf("Height", "Weight", "Goal weight")
-                val dropdownHeight = if (isScrollable) (maxVisibleItems * 48).dp else Dp.Unspecified
+            val maxVisibleItems = 5
+            val isScrollable = label in listOf("Height", "Weight", "Goal weight")
+            val dropdownHeight = if (isScrollable) (maxVisibleItems * 48).dp else Dp.Unspecified
 
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    modifier = Modifier.heightIn(max = dropdownHeight)
-                ) {
-                    options.forEach { selectionOption ->
-                        DropdownMenuItem(
-                            text = { Text(selectionOption, color = Color.White) },
-                            onClick = {
-                                onValueChange(selectionOption)
-                                expanded = false
-                            }
-                        )
-                    }
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.heightIn(max = dropdownHeight)
+            ) {
+                options.forEach { selectionOption ->
+                    DropdownMenuItem(text = { Text(selectionOption, color = Color.White) },
+                        onClick = {
+                            onValueChange(selectionOption)
+                            expanded = false
+                        })
                 }
             }
         }
     }
 }
+
+
+
