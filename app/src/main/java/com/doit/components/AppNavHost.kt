@@ -46,10 +46,18 @@ fun appNavHost() {
             })
         }
         composable("onboarding5") {
-            onboardingStepFiveScreen(onBack = { navController.popBackStack() }, onFinish = {
-//                navController.navigate("onboarding5")
-                Toast.makeText(null, "All Your Preferences are Saved", Toast.LENGTH_SHORT).show()
-            })
+            onboardingStepFiveScreen(
+                onBack = { navController.popBackStack() },
+                onFinish = {
+                    navController.navigate("mainHome") {
+                        popUpTo("onboarding1") { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+        composable("mainHome") {
+            MainHomeWithBottomNav()
         }
 
     }
