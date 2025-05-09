@@ -67,17 +67,23 @@ fun BottomNavigationBar(selectedTab: Int, onTabSelected: (Int) -> Unit) {
         )
     )
 
+    val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    val adjustedInset = (bottomInset - 58.dp).coerceAtLeast(0.dp)
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(85.dp) // ✅ Custom height
             .background(brush = gradient)
             .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+            .padding(bottom = adjustedInset)
+
     ) {
         NavigationBar(
             containerColor = Color.Transparent,
             tonalElevation = 0.dp,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
         ) {
             items.forEachIndexed { index, label ->
                 NavigationBarItem(selected = selectedTab == index,
@@ -105,6 +111,8 @@ fun BottomNavigationBar(selectedTab: Int, onTabSelected: (Int) -> Unit) {
         }
     }
 }
+
+
 
 
 

@@ -47,58 +47,82 @@ fun WorkoutScreen() {
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF141414))
-            .padding(16.dp)
     ) {
-        Text("Workouts", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(4.dp))
-        Text("Let's crush your goals, Badrinath!", color = Color.LightGray, fontSize = 13.sp)
-        Spacer(modifier = Modifier.height(16.dp))
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Workouts", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("Let's crush your goals, Badrinath!", color = Color.LightGray, fontSize = 13.sp)
+            Spacer(modifier = Modifier.height(16.dp))
 
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            itemsIndexed(days) { index, day ->
-                val isSelected = day.status is DayStatus.Ongoing
-                val isCompleted = day.status is DayStatus.Completed
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
-                        .border(
-                            width = if (isCompleted) 1.dp else 0.dp,
-                            color = if (isCompleted) Color(0xFF00E5A0) else Color.Transparent,
-                            shape = RoundedCornerShape(10.dp)
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                itemsIndexed(days) { index, day ->
+                    val isSelected = day.status is DayStatus.Ongoing
+                    val isCompleted = day.status is DayStatus.Completed
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .border(
+                                width = if (isCompleted) 1.dp else 0.dp,
+                                color = if (isCompleted) Color(0xFF00E5A0) else Color.Transparent,
+                                shape = RoundedCornerShape(10.dp)
+                            )
+                            .background(
+                                color = if (isSelected) Color(0xFF4EC5D6) else Color(0xFF1C1C1E),
+                                shape = RoundedCornerShape(10.dp)
+                            )
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                    ) {
+                        Text(day.shortName, color = Color.White, fontSize = 12.sp)
+                        Text(
+                            day.date,
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
                         )
-                        .background(
-                            color = if (isSelected) Color(0xFF4EC5D6) else Color(0xFF1C1C1E),
-                            shape = RoundedCornerShape(10.dp)
-                        )
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
-                ) {
-                    Text(day.shortName, color = Color.White, fontSize = 12.sp)
-                    Text(
-                        day.date,
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        WorkoutCard(
-            dayNumber = "Day 1", title = "Chest & Triceps", status = "Completed", isCompleted = true
-        )
-
-        WorkoutCard(
-            dayNumber = "Day 2", title = "Back & Biceps", status = "Ongoing", isOngoing = true
-        )
-
-        WorkoutCard(
-            dayNumber = "Day 3", title = "Legs & Core", lockMessage = "Unlocks tomorrow"
-        )
-
-        WorkoutCard(
-            dayNumber = "Day 4", title = "Shoulders & Core", lockMessage = "Unlocks in 1 day"
-        )
+        // Scrollable workout cards
+        androidx.compose.foundation.lazy.LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+            contentPadding = PaddingValues(bottom = 16.dp)
+        ) {
+            item {
+                WorkoutCard(
+                    dayNumber = "Day 1",
+                    title = "Chest & Triceps",
+                    status = "Completed",
+                    isCompleted = true
+                )
+            }
+            item {
+                WorkoutCard(
+                    dayNumber = "Day 2",
+                    title = "Back & Biceps",
+                    status = "Ongoing",
+                    isOngoing = true
+                )
+            }
+            item {
+                WorkoutCard(
+                    dayNumber = "Day 3", title = "Legs & Core", lockMessage = "Unlocks tomorrow"
+                )
+            }
+            item {
+                WorkoutCard(
+                    dayNumber = "Day 4",
+                    title = "Shoulders & Core",
+                    lockMessage = "Unlocks in 1 day"
+                )
+            }
+        }
     }
 }
 
@@ -159,7 +183,7 @@ fun WorkoutCard(
             }
         }
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Box {
             Column(modifier = Modifier.graphicsLayer {
@@ -167,7 +191,11 @@ fun WorkoutCard(
             }) {
                 Text(title, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
 
-                Spacer(modifier = Modifier.height(10.dp))
+//                Spacer(modifier = Modifier.height(14.dp))
+                if (!isCompleted) {
+                    Spacer(modifier = Modifier.height(14.dp))
+                }
+
 
                 if (!isCompleted) {
                     Row(
@@ -182,10 +210,10 @@ fun WorkoutCard(
                         IconWithText(R.drawable.ic_equipment, "Body weight")
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+//                    Spacer(modifier = Modifier.height(12.dp))
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 if (isOngoing) {
                     Button(

@@ -44,13 +44,20 @@ fun OnboardingScaffold(
         ViewCompat.getRootWindowInsets(view)
             ?.getInsets(WindowInsetsCompat.Type.statusBars())?.top?.toDp() ?: 0.dp
     }
-    val topPadding = topInsetPadding + 24.dp
+    val topPadding = topInsetPadding + 26.dp
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .padding(start = 24.dp, end = 24.dp, top = topPadding, bottom = 32.dp)
+            .padding(
+                start = 24.dp,
+                end = 24.dp,
+                top = topPadding,
+                bottom = WindowInsets.navigationBars
+                    .asPaddingValues()
+                    .calculateBottomPadding() + 24.dp
+            )
     ) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Icon(imageVector = Icons.Default.ArrowBack,
@@ -88,7 +95,7 @@ fun OnboardingScaffold(
         )
 
         val buttonLabel = if (step == totalSteps) "Finish" else "Continue"
-
+        Spacer(modifier = Modifier.height(12.dp))
         Button(
             onClick = onContinue,
             modifier = Modifier
